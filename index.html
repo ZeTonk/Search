@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-container{
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 8px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        .item{
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Products Search</h1>
+    <div class="search-container">
+        <input type="text" id="searchInput"
+        placeholder="Search products or prices (approximate matches)...">
+        <button id="searchButton">Search</button>
+    </div>
+
+        <div id="results">
+            <div class="item" data-name="laptop"
+            data-description="Powerful laptop with 16GB RAM"
+            data-price="999">
+            <h3>Laptop</h3>
+            <p>Powerful laptop with 16GB RAM</p>
+            <p>Price: $999</p>
+            </div>
+
+            <div class="item" data-name="smartphone"
+            data-description="Latest smartphone with great camera"
+            data-price="699">
+            <h3>Smartphone</h3>
+            <p>Latest smartphone with great camera</p>
+            <p>Price: $699</p>
+            </div>
+
+            <div class="item" data-name="tablet"
+            data-description="10-inch tablet perfect for entertainment"
+            data-price="349">
+            <h3>Tablet</h3>
+            <p>10-inch tablet perfect for entertainment</p>
+            <p>Price: $349</p>
+            </div>
+
+            <div class="item" data-name="headphones"
+            data-description="Noise cancelling wireless headphones"
+            data-price="199">
+            <h3>Headphones</h3>
+            <p>Noise cancelling wireless headphones</p>
+            <p>Price: $199</p>
+            </div>
+
+            <div class="item" data-name="smartwatch"
+            data-description="Fitness tracking smartwatch"
+            data-price="249">
+            <h3>Smartwatch</h3>
+            <p>Fitness tracking smartwatch</p>
+            <p>Price: $249</p>
+            </div>
+        </div>
+        <script>
+            // Get DOM elements
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const items = document.querySelectorAll('.item')
+
+            // Function to preform search
+            function preformSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+
+                // If search term is empty, show all items
+                if (searchTerm === '') {
+                    items.forEach(item => {
+                        item.classList.remove('hidden');
+                    });
+                    return;
+                }
+
+                // Loop through all items and check if they match search term
+                items.forEach(item => {
+                    const itemName = item.getAttribute('data-name').toLocaleLowerCase();
+                    const itemDescription = item.getAttribute('data-description').toLocaleLowerCase();
+                    const itemPrice = item.getAttribute('data-price');
+
+                    // Check if name, description, or price contains search term
+                    if (itemName.includes(searchTerm) || itemDescription.includes(searchTerm) || (isNumericSearch(searchTerm) && matchesPrice(itemPrice, searchTerm))) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Function to check if search term is numeric
+            function isNumericSearch(term) {
+                // Check if the term contains only digits or price indicators
+                return /\d/.test(term); // Returns true if the term contians at least one digit
+            }
+
+            // Funciton to check if price matches search terms
+            function matchesPrice(price, term) {
+                // Remove any currency symbols from the search term
+                const cleanTerm = term.replace(/[$£€]/g, '');
+
+                // Check if the search term is a number
+                if (!isNaN(cleanTerm) && cleanTerm !== '') {
+                    const searchNumber = parseFloat(cleanTerm);
+                    const itemPrice = parseFloat(price);
+
+                    // Check if the price is within ± 20% of the search term
+                    const lowerBound = searchNumber * 0.8;
+                    const upperBound = searchNumber * 1.2;
+
+                    return itemPrice >= lowerBound && itemPrice <= upperBound;
+                }
+                return false;
+            }
+
+            // Add event listener to search button
+            searchButton.addEventListener('click', preformSearch);
+
+            // Add event listener for pressing Enter key in search input
+            searchInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    preformSearch();
+                }
+            });
+
+            // Optional: Add a real-time search functionality
+            searchInput.addEventListener('input', preformSearch);
+        </script>
+</body>
+</html>
